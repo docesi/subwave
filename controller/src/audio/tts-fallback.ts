@@ -141,6 +141,7 @@ export function orderedFallbacks(
   defaultEngine: string | null | undefined,
   usable: (engine: string, cloudProvider?: string | null) => boolean,
   defaultCloudProvider: string | null | undefined = null,
+  language: string = "",
 ): RescueSlot[] {
   const primaryTarget: TtsTarget = typeof primary === 'string'
     ? { engine: primary }
@@ -162,6 +163,10 @@ export function orderedFallbacks(
   for (const slot of candidates) {
     const { engine } = slot;
     const target = slotTarget(slot);
+    // Skip Kokoro for Finnish text (no Finnish voice available)
+    if (language.toLowerCase().startsWith("finnish") && engine === "kokoro") {
+      continue;
+    }
     if (
       !engine
       || sameTtsTarget(target, primaryTarget, defaultCloudProvider)
